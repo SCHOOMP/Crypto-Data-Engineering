@@ -5,7 +5,7 @@ from io import StringIO
 from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 load_dotenv()
 
@@ -21,7 +21,6 @@ if not all([DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD]):
 
 
 # COPY-based bulk loader, passed to to_sql as the `method`.
-# This streams rows into Postgres via COPY instead of running INSERTs.
 def psql_copy(table, conn, keys, data_iter):
     dbapi_conn = conn.connection
     with dbapi_conn.cursor() as cur:
@@ -42,7 +41,6 @@ engine = create_engine(
     f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 
-# Test connection for real
 with engine.connect() as connection:
     print("Engine Connected")
 
@@ -66,9 +64,38 @@ df = df.rename(columns={
     "Volume": "volume",
 })
 
-
 # Keep only the six columns the table expects
-df = df[["ts_epoch", "open", "high", "low", "close", "volume"]]
+staging_cols = ["ts_epoch", "open", "high", "low", "close", "volume"]
+df = df[staging_cols]
 
-df.to_sql("bitcoin_raw", engine, if_exists="append", index=False, method=psql_copy)
-print("Load complete:", len(df), "rows")
+# idempotent load: COPY into staging
+with engine.begin() as conn:
+    conn.exec_driver_sql("DROP TABLE IF EXISTS staging_bitcoin;")
+    conn.exec_driver_sql("""
+        CREATE TABLE staging_bitcoin (
+            ts_epoch BIGINT,
+            open     NUMERIC(18,8),
+            high     NUMERIC(18,8),
+            low      NUMERIC(18,8),
+            close    NUMERIC(18,8),
+            volume   NUMERIC(24,8)
+        );
+    """)
+
+    before = conn.execute(text("SELECT count(*) FROM bitcoin_raw;")).scalar()
+
+    # fast COPY
+    df.to_sql("staging_bitcoin", conn, if_exists="append",
+              index=False, method=psql_copy)
+
+    # merge
+    conn.exec_driver_sql("""
+        INSERT INTO bitcoin_raw (ts_epoch, open, high, low, close, volume)
+        SELECT ts_epoch, open, high, low, close, volume
+        FROM staging_bitcoin
+        ON CONFLICT (ts_epoch) DO NOTHING;
+    """)
+
+    after = conn.execute(text("SELECT count(*) FROM bitcoin_raw;")).scalar()
+
+print(f"bitcoin_raw: {before} -> {after} rows (+{after - before} new)")
