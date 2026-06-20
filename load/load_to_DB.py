@@ -66,6 +66,7 @@ df = df.rename(columns={
     "Volume": "volume",
 })
 
+
 # Keep only the six columns the table expects
 df = df[["ts_epoch", "open", "high", "low", "close", "volume"]]
 
