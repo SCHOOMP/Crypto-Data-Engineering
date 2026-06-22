@@ -183,5 +183,26 @@ that the raw layer tolerates and a later cleaning step will handle.
 - Added `.env.example` and `requirements.txt` for reproducibility.
 - Next up: the modeled layer and dbt data-quality tests.
 
+### Day 8 — 
+
+### Day 9 — 
+
+### Day 10 — 
+
+### Day 11 — 
+
+### Day 12 — 
+
+### Day 13 — 
+
+### Day 14 — 
+
+### Day 15 — 
+
+### Day 16 — 
+
+### Day 17 — 
+
+
 ### < Today > — < your entry >
 -
