@@ -2,7 +2,6 @@ import os
 import csv
 import glob
 from io import StringIO
-from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
