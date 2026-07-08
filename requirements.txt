@@ -1,0 +1,2 @@
+gridstatus~=0.36.0
+binary~=1.0.2

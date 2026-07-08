@@ -14,5 +14,12 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       retries: 10
+  ingestion:
+    build: ./ingestion
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    entrypoint: [ "tail", "-f", "/dev/null" ]
 volumes:
   db_data:

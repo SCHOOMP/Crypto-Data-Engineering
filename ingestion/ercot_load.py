@@ -1,3 +1,4 @@
+## Sample Ingestion ##
 import gridstatus
 iso = gridstatus.Ercot()
 load = iso.get_load("today")        # DataFrame: Time, Load
