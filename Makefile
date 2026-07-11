@@ -1,4 +1,6 @@
-.PHONY: up down psql logs clean
+.PHONY: up down psql logs clean ingest
+
+HOURS ?= 24
 
 up:
 	docker compose up -d --build
@@ -14,3 +16,6 @@ logs:
 
 clean:
 	docker compose down -v
+
+ingest:
+	docker compose exec ingestion python ercot_load.py $(if $(SOURCE),--source $(SOURCE)) --hours $(HOURS)
