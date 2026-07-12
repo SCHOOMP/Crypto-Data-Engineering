@@ -1,0 +1,2 @@
+### Austin — hourly weather, past 2 days, UTC
+GET https://api.open-meteo.com/v1/forecast?latitude=30.27&longitude=-97.74&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&past_days=2&timezone=UTC
