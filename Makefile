@@ -1,4 +1,4 @@
-.PHONY: up down psql logs clean ingest
+.PHONY: up down psql logs clean seed-grid seed-weather refresh
 
 HOURS ?= 24
 
@@ -17,5 +17,10 @@ logs:
 clean:
 	docker compose down -v
 
-ingest:
+seed-grid:
 	docker compose exec ingestion python ercot_load.py $(if $(SOURCE),--source $(SOURCE)) --hours $(HOURS)
+
+seed-weather:
+	docker compose exec ingestion python weather.py
+
+refresh: seed-grid seed-weather
