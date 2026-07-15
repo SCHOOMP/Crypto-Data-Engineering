@@ -12,7 +12,7 @@ psql:
 	docker compose exec db psql -U grid -d grid_observatory
 
 logs:
-	docker compose logs -f
+	docker compose logs -f meters
 
 clean:
 	docker compose down -v
