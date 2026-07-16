@@ -1,4 +1,4 @@
-.PHONY: up down psql logs clean seed-grid seed-weather refresh
+.PHONY: up down psql logs clean seed-grid seed-weather refresh transform
 
 HOURS ?= 24
 
@@ -24,3 +24,6 @@ seed-weather:
 	docker compose exec ingestion python weather.py
 
 refresh: seed-grid seed-weather
+
+transform:
+	docker compose exec dbt dbt build

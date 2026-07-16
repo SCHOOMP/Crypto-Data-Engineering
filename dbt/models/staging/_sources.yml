@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: grid_conditions
+      - name: weather
+      - name: meter_telemetry
+      - name: meter_events

@@ -30,5 +30,13 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+  dbt:
+    build: ./dbt
+    container_name: grid_dbt
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    entrypoint: [ "tail", "-f", "/dev/null" ]
 volumes:
   db_data:
